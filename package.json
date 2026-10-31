@@ -1,0 +1,23 @@
+{
+  "name": "group4_test",
+  "version": "1.0.0",
+  "description": "Nhóm 4 - Kiểm thử phần mềm",
+  "main": "index.js",
+  "scripts": {},
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/JukisYuri/Group4_Test.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "type": "commonjs",
+  "bugs": {
+    "url": "https://github.com/JukisYuri/Group4_Test/issues"
+  },
+  "homepage": "https://github.com/JukisYuri/Group4_Test#readme",
+  "devDependencies": {
+    "@playwright/test": "^1.64.1",
+    "@types/node": "^26.6.6"
+  }
+}
