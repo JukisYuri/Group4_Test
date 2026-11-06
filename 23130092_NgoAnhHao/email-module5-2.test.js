@@ -257,15 +257,9 @@ test.describe('Email Accounts Management Module (TS-Module5-2)', () => {
     await markDefaultBtn.click();
     await page.waitForLoadState('domcontentloaded');
 
-    // Sau khi click Mark as default, nopCommerce reload lại trang danh sách -> cần chọn lại 100 items để tìm thấy row
-    if (await lengthSelect.isVisible()) {
-      await lengthSelect.selectOption('100');
-    }
+    await expect(page.locator('.alert-success')).toContainText(/default email account has been changed|updated successfully/i, { timeout: 5000 });
 
-    const updatedRow = page.locator('#email-accounts-grid tbody tr', { hasText: email });
-    await expect(updatedRow.locator('i.true-icon, i[nop-value="true"], i.fa-check')).toBeVisible({ timeout: 10000 });
-
-    // Khôi phục tài khoản đầu tiên làm mặc định để các test khác có thể xóa tài khoản tạm
+    // Khôi phục tài khoản đầu tiên làm mặc định để các test khác không bị ảnh hưởng
     const firstRow = page.locator('#email-accounts-grid tbody tr').first();
     const firstRowBtn = firstRow.locator('a[href*="MarkAsDefaultEmail"]');
     if ((await firstRowBtn.count()) > 0 && (await firstRowBtn.isVisible())) {
@@ -285,17 +279,8 @@ test.describe('Email Accounts Management Module (TS-Module5-2)', () => {
     await confirmBtn.waitFor({ state: 'visible', timeout: 10000 });
     await confirmBtn.click();
 
-    // nopCommerce 4.x: hệ thống KHÔNG chặn xóa tài khoản mặc định (hiện thông báo "deleted successfully"),
-    // hoặc chặn bằng thông báo lỗi tùy phiên bản -> chấp nhận cả hai kết quả.
-    const result = page.locator('.alert-danger, .validation-summary-errors, .alert-success, :text("deleted successfully"), :text("default")');
-    await expect(result.first()).toBeVisible({ timeout: 10000 });
-
-    // Khôi phục: đảm bảo luôn còn 1 tài khoản mặc định để các test khác không bị ảnh hưởng
-    await page.goto(LIST_URL, { waitUntil: 'domcontentloaded' });
-    await page.locator('#email-accounts-grid tbody tr').first().waitFor({ state: 'visible', timeout: 10000 });
-    if ((await page.locator('#email-accounts-grid tbody i.true-icon, #email-accounts-grid tbody i[nop-value="true"]').count()) === 0) {
-      await page.locator('#email-accounts-grid tbody tr').first().locator('a[href*="MarkAsDefaultEmail"]').click();
-    }
+    const alertErr = page.locator('.alert-danger, .validation-summary-errors');
+    await expect(alertErr.first()).toBeVisible({ timeout: 5000 });
   });
 
   test('TC_EMAIL_TEST_17 - Kiểm tra chức năng gửi email thử nghiệm [Send test email] trong trang Edit', async ({ page }) => {
