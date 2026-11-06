@@ -5,7 +5,7 @@
   "main": "nopcommerce-all-in-one.spec.js",
   "scripts": {
     "test": "playwright test",
-    "test:e2e": "playwright test nopcommerce-all-in-one.spec.js"
+    "test:e2e": "playwright test topics.spec.js news.spec.js blog.spec.js forums.spec.js"
   },
   "repository": {
     "type": "git",
