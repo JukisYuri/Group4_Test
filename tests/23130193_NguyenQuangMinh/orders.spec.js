@@ -10,12 +10,12 @@ import { test, expect } from '@playwright/test';
  *   npx playwright test tests/23130193_NguyenQuangMinh/orders.spec.js --project=chromium
  */
 
-const BASE_URL = 'http://127.0.0.1:8081';
-const ADMIN_EMAIL = 'admin@yourstore.com';
-const ADMIN_PASSWORD = 'admin';
+const BASE_URL = (process.env.BASE_URL || 'http://127.0.0.1:8081').replace(/\/$/, '');
+const ADMIN_EMAIL = process.env.ADMIN_EMAIL || 'admin@yourstore.com';
+const ADMIN_PASSWORD = process.env.ADMIN_PASSWORD || 'admin';
 
-// Chạy tuần tự trong file để dữ liệu đơn hàng không bị thay đổi chồng chéo giữa các test.
-test.describe.configure({ mode: 'serial' });
+// Chạy tuần tự được cấu hình qua workers: 1 trong playwright.config.js
+// test.describe.configure({ mode: 'serial' });
 
 // ---------------------------------------------------------------------------
 // Hàm dùng chung
@@ -105,9 +105,11 @@ async function changeOrderStatus(page, statusValue) {
 
 /** Parse chuỗi ngày dạng MM/DD/YYYY (có thể kèm giờ) */
 function parseUsDate(text) {
+  if (!text) return null;
   const m = String(text).match(/(\d{1,2})\/(\d{1,2})\/(\d{4})/);
-  if (!m) return null;
-  return new Date(Number(m[3]), Number(m[1]) - 1, Number(m[2]));
+  if (m) return new Date(Number(m[3]), Number(m[1]) - 1, Number(m[2]));
+  const d = new Date(text);
+  return isNaN(d.getTime()) ? null : d;
 }
 
 // ---------------------------------------------------------------------------
@@ -137,7 +139,7 @@ test.describe('QUẢN LÝ ĐƠN HÀNG (ORDERS)', () => {
     await expect(page.locator('#EndDate')).toHaveValue('2030-12-31');
 
     // Kỳ vọng: chỉ hiển thị các đơn có ngày tạo nằm trong khoảng lọc
-    const createdOnList = await columnTexts(page, 'orders-grid', 7);
+    const createdOnList = await columnTexts(page, 'orders-grid', 6);
     expect(createdOnList.length).toBeGreaterThan(0);
     for (const text of createdOnList) {
       const createdOn = parseUsDate(text);
@@ -239,7 +241,7 @@ test.describe('QUẢN LÝ ĐƠN HÀNG (ORDERS)', () => {
     const orderStatuses = await columnTexts(page, 'orders-grid', 2);
     const paymentStatuses = await columnTexts(page, 'orders-grid', 3);
     const shippingStatuses = await columnTexts(page, 'orders-grid', 4);
-    const dates = await columnTexts(page, 'orders-grid', 7);
+    const dates = await columnTexts(page, 'orders-grid', 6);
     expect(orderStatuses.length).toBeGreaterThan(0);
     for (let i = 0; i < orderStatuses.length; i++) {
       expect(orderStatuses[i]).toMatch(/Processing/);

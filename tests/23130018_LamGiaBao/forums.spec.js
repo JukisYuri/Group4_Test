@@ -1,5 +1,5 @@
 const { expect, test } = require('@playwright/test');
-const { BASE } = require('./nopcommerce-test-helpers');
+const { BASE, loginAdmin } = require('./nopcommerce-test-helpers');
 
 const forums = {
   route: '/Admin/Forum/List',
@@ -10,6 +10,7 @@ const forums = {
 
 test.describe('Forums Test Suite', () => {
   test('TC_FORUM_LIST_01 - Hiển thị danh sách diễn đàn', async ({ page }) => {
+    await loginAdmin(page);
     await page.goto(`${BASE}${forums.route}`, { waitUntil: 'domcontentloaded' });
     await expect(page.locator(forums.pageReady).first()).toBeVisible({ timeout: 15000 });
     await expect(page.locator('table').first()).toBeVisible();
@@ -24,6 +25,7 @@ test.describe('Forums Test Suite', () => {
   });
 
   test('TC_FORUM_FORM_01 - Mở biểu mẫu nhóm diễn đàn', async ({ page }) => {
+    await loginAdmin(page);
     await page.goto(`${BASE}${forums.createPath}`, { waitUntil: 'domcontentloaded' });
     await expect(page.locator('#Name, input[name="Name"]').first()).toBeVisible({ timeout: 15000 });
   });

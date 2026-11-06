@@ -1,9 +1,9 @@
 import { test, expect } from '@playwright/test';
 import fs from 'fs';
 
-const BASE_URL = 'http://localhost:8080';
-const ADMIN_EMAIL = 'admin@yourstore.com';
-const ADMIN_PASSWORD = 'admin';
+const BASE_URL = (process.env.BASE_URL || 'http://localhost:8080').replace(/\/$/, '');
+const ADMIN_EMAIL = process.env.ADMIN_EMAIL || 'admin@yourstore.com';
+const ADMIN_PASSWORD = process.env.ADMIN_PASSWORD || 'admin';
 
 const NO_DATA = 'No data available in table';
 const REG_DATE = '2025-11-04';

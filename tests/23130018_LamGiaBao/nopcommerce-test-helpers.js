@@ -3,6 +3,26 @@ const { test, expect } = require('@playwright/test');
 
 const BASE = (process.env.BASE_URL || 'http://localhost:80').replace(/\/$/, '');
 const MUTATING = String(process.env.RUN_MUTATING_TESTS || 'true').toLowerCase() === 'true';
+const ADMIN_EMAIL = process.env.ADMIN_EMAIL || 'admin@yourstore.com';
+const ADMIN_PASSWORD = process.env.ADMIN_PASSWORD || 'Admin@123';
+
+async function loginAdmin(page) {
+  await page.goto(`${BASE}/login?returnUrl=%2FAdmin`, { waitUntil: 'domcontentloaded' }).catch(() => {});
+  const emailInput = page.locator('#Email, input[name="Email"]').first();
+  const passInput = page.locator('#Password, input[name="Password"]').first();
+  if (await emailInput.isVisible().catch(() => false)) {
+    await emailInput.fill(ADMIN_EMAIL);
+    await passInput.fill(ADMIN_PASSWORD);
+    await page.locator('button.login-button').first().click();
+    await page.waitForLoadState('domcontentloaded').catch(() => {});
+  }
+}
+
+async function ensureLogin(page) {
+  if (page.url().includes('/login') || page.url().endsWith('/')) {
+    await loginAdmin(page);
+  }
+}
 
 async function clickSelector(container, selectors) {
   for (const selector of selectors) {
@@ -36,6 +56,10 @@ async function findField(page, definition, required = true) {
 
 async function go(page, cfg) {
   await page.goto(`${BASE}${cfg.route}`, { waitUntil: 'domcontentloaded' });
+  if (page.url().includes('/login')) {
+    await loginAdmin(page);
+    await page.goto(`${BASE}${cfg.route}`, { waitUntil: 'domcontentloaded' });
+  }
   await expect(page).not.toHaveURL(/\/login/i, { timeout: 15000 });
   await expect(page.locator(cfg.pageReady).first()).toBeVisible({ timeout: 15000 });
 }
@@ -58,6 +82,10 @@ async function requireMutation() {
 
 async function openCreate(page, cfg) {
   await page.goto(`${BASE}${cfg.createPath}`, { waitUntil: 'domcontentloaded' });
+  if (page.url().includes('/login')) {
+    await loginAdmin(page);
+    await page.goto(`${BASE}${cfg.createPath}`, { waitUntil: 'domcontentloaded' });
+  }
   await expect(page).not.toHaveURL(/\/login/i, { timeout: 15000 });
   await expect(page).toHaveURL(new RegExp(cfg.createPath.replace('/', '\\/'), 'i'));
 }
@@ -199,4 +227,4 @@ function registerSuite(name, cfg, cases) {
   });
 }
 
-module.exports = { BASE, commonCases, registerSuite };
+module.exports = { BASE, commonCases, registerSuite, loginAdmin };

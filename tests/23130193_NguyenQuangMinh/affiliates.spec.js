@@ -10,11 +10,12 @@ import { test, expect } from '@playwright/test';
  *   npx playwright test tests/23130193_NguyenQuangMinh/affiliates.spec.js --project=chromium
  */
 
-const BASE_URL = 'http://127.0.0.1:8081';
-const ADMIN_EMAIL = 'admin@yourstore.com';
-const ADMIN_PASSWORD = 'admin';
+const BASE_URL = (process.env.BASE_URL || 'http://127.0.0.1:8081').replace(/\/$/, '');
+const ADMIN_EMAIL = process.env.ADMIN_EMAIL || 'admin@yourstore.com';
+const ADMIN_PASSWORD = process.env.ADMIN_PASSWORD || 'admin';
 
-test.describe.configure({ mode: 'serial' });
+// Chạy tuần tự được cấu hình qua workers: 1 trong playwright.config.js
+// test.describe.configure({ mode: 'serial' });
 
 // ---------------------------------------------------------------------------
 // Hàm dùng chung
