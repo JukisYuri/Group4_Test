@@ -1,0 +1,27 @@
+{
+  "name": "nopcommerce",
+  "version": "1.0.0",
+  "description": "nopCommerce: free and open-source eCommerce solution\r ===========",
+  "main": "nopcommerce-all-in-one.spec.js",
+  "scripts": {
+    "test": "playwright test",
+    "test:e2e": "playwright test nopcommerce-all-in-one.spec.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/nopSolutions/nopCommerce.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "type": "commonjs",
+  "bugs": {
+    "url": "https://github.com/nopSolutions/nopCommerce/issues"
+  },
+  "homepage": "https://github.com/nopSolutions/nopCommerce#readme",
+  "devDependencies": {
+    "@playwright/test": "^1.64.1",
+    "cross-env": "^10.1.0",
+    "dotenv": "^18.0.9"
+  }
+}
