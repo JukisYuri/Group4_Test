@@ -177,25 +177,18 @@ test.describe('Shopping Cart Module', () => {
   });
 
   test('TC_CART_EDIT_12 - Báo lỗi / khôi phục khi nhập số âm hoặc chữ trong giỏ', async ({ page }) => {
-    for (const bad of ['-2', 'xyz']) {
+    await page.goto('/cart', { waitUntil: 'domcontentloaded' });
+    if ((await page.locator('table.cart tbody tr').count()) === 0) {
+      await addBYOCToCart(page);
       await page.goto('/cart', { waitUntil: 'domcontentloaded' });
-      if ((await page.locator('table.cart tbody tr').count()) === 0) {
-        await addBYOCToCart(page);
-        await page.goto('/cart', { waitUntil: 'domcontentloaded' });
-      }
-
-      const qtyInput = page.locator('.qty-input');
-      await qtyInput.fill(bad);
-      await qtyInput.press('Enter');
-      await page.waitForTimeout(1000);
-
-      const val = await qtyInput.inputValue().catch(() => null);
-      const hasError = await page.locator('.message-error, .bar-notification.error, .field-validation-error, .warning-box').count();
-      const isEmpty = await page.locator('.order-summary-content', { hasText: 'Your Shopping Cart is empty!' }).count();
-
-      // Hệ thống không ghi nhận số âm / chữ cái (báo lỗi, khôi phục số dương, hoặc xóa dòng về giỏ rỗng)
-      expect(val === null || isEmpty > 0 || hasError > 0 || (val !== bad && Number(val) > 0)).toBeTruthy();
     }
+
+    const qtyInput = page.locator('.qty-input');
+    await qtyInput.fill('-2');
+    await qtyInput.press('Enter');
+
+    const errorMsg = page.locator('.message-error, .bar-notification.error, .field-validation-error, .warning-box');
+    await expect(errorMsg.first()).toBeVisible({ timeout: 5000 });
   });
 
   test('TC_CART_EDIT_13 - Chỉnh sửa cấu hình qua liên kết [Edit]', async ({ page }) => {
